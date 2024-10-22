@@ -1,2 +1,4 @@
 # Lab.py
- A simple python library that automates the evaluation of pennylane-torch models.
+Common code to plot metrics and evaluate pennylane-torch models.
+- `Lab.py`
+   - JSON file -> (n) `Experiment` -> `Trainer` -> `Plotter`.
