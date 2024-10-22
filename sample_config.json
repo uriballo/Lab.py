@@ -1,0 +1,44 @@
+{
+    "path_to_save_plots" : "plots",
+    "path_to_dataset": "EuroSAT_RGB",
+    "path_to_save_raw_data": "raw_data"
+
+    "experiments" : [
+        {
+            "filename": "5class_HQNN_AdamSF", 
+            "title" : "HQNN_Parallel",
+            "subtitle" : "Five class classification w/ HQNN_Parallel",
+            "optimizer" : "AdamSF",
+            "lr" : 0.0025,
+            "weight_decay": 1e-3,
+            "n_classes": 5,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 1000,
+            "epochs": 10,
+            "confusion_mat": "True"
+        },
+        {
+            "filename": "10class_HQNN_AdamSF", 
+            "title" : "HQNN_Parallel",
+            "subtitle" : "Five class classification w/ HQNN_Parallel",
+            "optimizer" : "AdamSF",
+            "lr" : 0.0025,
+            "weight_decay": 1e-3,
+            "n_classes": 10,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 1000,
+            "epochs": 10,
+            "confusion_mat": "True"
+        }
+    ],
+    
+    "checkpointing": {
+        "save_best": "True", 
+        "monitor": "val_accuracy",
+        "save_path": "checkpoints/"
+    }
+}
