@@ -36,16 +36,6 @@ def line_plot(title, metrics, labels, xlabel, ylabel, save_path, filename):
     plt.savefig(save_path + filename, bbox_inches='tight')
     
 def cf_plot(confusion_matrix, labels, title='Confusion Matrix', save_path='', filename='confusion_matrix.png'):
-    """
-    Plots a confusion matrix using seaborn's heatmap.
-
-    Args:
-        confusion_matrix (np.ndarray): 2D array representing the confusion matrix.
-        labels (list of str): List of class labels.
-        title (str): Title of the plot.
-        save_path (str): Directory path to save the plot.
-        filename (str): Filename for the saved plot.
-    """
     plt.figure(figsize=(8, 6))
     
     # Plotting the confusion matrix with heatmap
