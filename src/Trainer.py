@@ -1,9 +1,7 @@
-import numpy as np
 import torch
 import time
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
-import matplotlib.pyplot as plt
-from Plotter import cf_plot, line_plot
+from src.Plotter import cf_plot, line_plot
 
 class Trainer:
     def __init__(self, allowed_class_idx=None, save_path="", acc_filename="acc.png", loss_filename="loss.png"):
