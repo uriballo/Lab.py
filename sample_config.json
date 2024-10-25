@@ -5,7 +5,7 @@
 
     "experiments" : [
         {
-            "filename": "QNN4ESAT_AdamSF_25e-4_10c_1000ex-per-class.png", 
+            "filename": "QNN4ESAT_AdamSF_25e-4_10c_1000ex-per-class", 
             "title" : "HQNN_Parallel",
             "model" : "QNN4ESAT",
             "optimizer" : "AdamWSF",
@@ -19,7 +19,7 @@
             "epochs": 20
         },
         {
-            "filename": "QNN4ESAT_AdamSF_3e-4_10c_1000ex-per-class.png", 
+            "filename": "QNN4ESAT_AdamSF_3e-4_10c_1000ex-per-class", 
             "title" : "HQNN_Parallel",
             "model" : "QNN4ESAT",
             "optimizer" : "AdamWSF",
