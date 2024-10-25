@@ -1,4 +1,9 @@
 import json
+import torch.optim as optim
+import schedulefree as sf_optim
+from src.Trainer import Trainer
+from src.EuroSAT import EuroSAT
+from src.ModelInstances import choose_model
 
 class ExperimentConfig:
     def __init__(self, path_to_save_plots, path_to_save_raw_data, path_to_dataset, experiments, checkpointing):
@@ -9,26 +14,86 @@ class ExperimentConfig:
         self.checkpointing = checkpointing
 
 class Experiment:
-    def __init__(self, filename, title, subtitle, optimizer, lr, weight_decay, n_classes, image_size, batch_size, allowed_classes, examples_per_class, epochs, confusion_mat):
+    def __init__(self, filename, title, model, optimizer, lr, weight_decay, n_classes, image_size, batch_size, allowed_classes, examples_per_class, epochs):
         self.filename = filename
         self.title = title
-        self.subtitle = subtitle
         self.optimizer = optimizer
+        self.model = model
         self.lr = lr
         self.weight_decay = weight_decay
         self.n_classes = n_classes
         self.image_size = image_size
         self.batch_size = batch_size
-        self.allowed_classes = allowed_classes
+        self.allowed_classes = None #allowed_classes
         self.examples_per_class = examples_per_class
         self.epochs = epochs
-        self.confusion_mat = confusion_mat
 
 class Checkpointing:
     def __init__(self, save_best, monitor, save_path):
         self.save_best = save_best
         self.monitor = monitor
         self.save_path = save_path
+        
+class ExperimentRunner:
+    def __init__(self, config: ExperimentConfig):
+        self.config = config
+    
+    def initialize_model(self, model_name, num_classes):
+        return choose_model(model_name, num_classes)
+    
+    def initialize_optimizer(self, optimizer_name, model_params, lr, weight_decay):
+        if optimizer_name == "Adam":
+            return optim.Adam(model_params, lr=lr, weight_decay=weight_decay)
+        elif optimizer_name == "SGD":
+            return optim.SGD(model_params, lr=lr, weight_decay=weight_decay)
+        elif optimizer_name == "AdamWSF":
+            return sf_optim.AdamWScheduleFree(model_params, lr=lr, weight_decay=weight_decay)
+        elif optimizer_name == "SGDSF":
+            return sf_optim.SGDScheduleFree(model_params, lr=lr, weight_decay=weight_decay)
+        else:
+            raise ValueError(f"Unknown optimizer: {optimizer_name}")
+
+    def run_experiment(self, experiment: Experiment):
+        # Setup paths
+        save_path = f"{self.config.path_to_save_plots}/{experiment.filename}"
+        
+        # Initialize model, optimizer, and dataset loaders
+        model = self.initialize_model(experiment.model, experiment.n_classes)
+        optimizer = self.initialize_optimizer(experiment.optimizer, model.parameters(), experiment.lr, experiment.weight_decay)
+        
+        # Load dataset and split into train/val sets
+        train_loader, val_loader = EuroSAT(
+            root=self.config.path_to_dataset,
+            batch_size=experiment.batch_size,
+            image_size=experiment.image_size,
+            allowed_classes=experiment.allowed_classes,
+            examples_per_class=experiment.examples_per_class,
+            num_classes=experiment.n_classes
+        ).get_loaders()
+        
+        # Initialize Trainer with the experiment's parameters
+        trainer = Trainer(
+            save_path=save_path,
+            acc_filename=f"{experiment.filename}_acc.png",
+            loss_filename=f"{experiment.filename}_loss.png"
+        )
+        
+        # Train model
+        trainer.train_model(
+            train_loader=train_loader,
+            val_loader=val_loader,
+            model=model,
+            device="cpu",
+            optimizer=optimizer,
+            num_epochs=experiment.epochs,
+            plot=True,
+            verbose=True
+        )
+
+    def run_all_experiments(self):
+        for experiment in self.config.experiments:
+            print(f"Running experiment: {experiment.title}")
+            self.run_experiment(experiment)
         
 def load_config_file(file_path):
     with open(file_path, 'r') as file:
@@ -39,7 +104,7 @@ def load_config_file(file_path):
             Experiment(
                 filename=exp['filename'],
                 title=exp['title'],
-                subtitle=exp['subtitle'],
+                model=exp['model'],
                 optimizer=exp['optimizer'],
                 lr=exp['lr'],
                 weight_decay=exp['weight_decay'],
@@ -49,7 +114,6 @@ def load_config_file(file_path):
                 allowed_classes=exp['allowed_classes'],
                 examples_per_class=exp['examples_per_class'],
                 epochs=exp['epochs'],
-                confusion_mat=exp['confusion_mat']
             ) for exp in data['experiments']
         ]
         
@@ -63,7 +127,7 @@ def load_config_file(file_path):
         # Create and return the ExperimentConfig instance
         return ExperimentConfig(
             path_to_save_plots=data['path_to_save_plots'],
-            path_to_save_raw_data=data['path_to_save_raw_data']
+            path_to_save_raw_data=data['path_to_save_raw_data'],
             path_to_dataset=data['path_to_dataset'],
             experiments=experiments,
             checkpointing=checkpointing

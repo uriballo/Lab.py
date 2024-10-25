@@ -1,4 +1,6 @@
-from src.Plotter import line_plot
+from src.Lab import ExperimentRunner, load_config_file
 
-
-line_plot("This is a test!", [[1, 2, 3.5, 4.2], [0, 2, 2, 2]], ["Accuracy", "Val_Accuracy"], "Epochs", "Random (%)", "", "test.png")
+if __name__ == "__main__":
+    config = load_config_file("sample_config.json")
+    runner = ExperimentRunner(config)
+    runner.run_all_experiments()
