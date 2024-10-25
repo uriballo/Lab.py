@@ -55,6 +55,7 @@ class ExperimentRunner:
 
     def run_experiment(self, experiment: Experiment):
         # Setup paths
+        # TODO: FIX SAVEPATH BEING THE SAME FOR ALL
         save_path = f"{self.config.path_to_save_plots}/{experiment.filename}"
         
         # Initialize model, optimizer, and dataset loaders
