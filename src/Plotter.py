@@ -50,5 +50,5 @@ def cf_plot(confusion_matrix, labels, title='Confusion Matrix', save_path='', fi
     
     plt.tight_layout()
     plt.savefig(save_path + filename + '.png', bbox_inches='tight')
-    plt.show()
+    #plt.show()
 
