@@ -1,4 +1,4 @@
-from src.QLayers import QuantumLinear
+from src.QLayers import QuantumLinear, QuConv2D_MQ
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -54,3 +54,22 @@ class QNN4ESAT(nn.Module):
         x = F.softmax(self.fc3(x), dim=1)
         
         return x
+
+class QEConvAngE(nn.Module):
+    def __init__(self, q_circuit, weight_shapes, num_qubits=4, embedding="n", num_classes=10):
+        super(QEConvAngE, self).__init__()
+        
+        self.conv = QuConv2D_MQ(kernel_size=2, stride=1, in_channels=3, out_channels=12, q_circuit=q_circuit, weight_shapes=weight_shapes, num_qubits=num_qubits, embedding=embedding) 
+        self.connector = nn.Linear(12 * 15 * 15, 512)       
+        self.classification = nn.Linear(512, num_classes)
+            
+        print("Number of trainable parameters: ", sum(p.numel() for p in self.parameters() if p.requires_grad))
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = x.view(x.shape[0], -1)
+        x = self.connector(x)
+        x = F.leaky_relu(x)
+        x = self.classification(x)
+        
+        return F.softmax(x, -1)

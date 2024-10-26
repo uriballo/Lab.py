@@ -33,9 +33,9 @@ def line_plot(title, metrics, labels, xlabel, ylabel, save_path, filename):
     plt.legend(fontsize=12)
     
     plt.tight_layout()
-    plt.savefig(save_path + filename, bbox_inches='tight')
+    plt.savefig(save_path + filename + '.png', bbox_inches='tight')
     
-def cf_plot(confusion_matrix, labels, title='Confusion Matrix', save_path='', filename='confusion_matrix.png'):
+def cf_plot(confusion_matrix, labels, title='Confusion Matrix', save_path='', filename='confusion_matrix'):
     plt.figure(figsize=(8, 6))
     
     # Plotting the confusion matrix with heatmap
@@ -49,6 +49,6 @@ def cf_plot(confusion_matrix, labels, title='Confusion Matrix', save_path='', fi
     plt.yticks(rotation=0)
     
     plt.tight_layout()
-    plt.savefig(save_path + filename, bbox_inches='tight')
+    plt.savefig(save_path + filename + '.png', bbox_inches='tight')
     plt.show()
 

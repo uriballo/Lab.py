@@ -1,10 +1,10 @@
 import torch
 import time
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
+from sklearn.metrics import confusion_matrix, precision_score, f1_score
 from src.Plotter import cf_plot, line_plot
 
 class Trainer:
-    def __init__(self, allowed_class_idx=None, save_path="", acc_filename="acc.png", loss_filename="loss.png"):
+    def __init__(self, allowed_class_idx=None, save_path="plots", acc_filename="acc.png", loss_filename="loss.png", cf_filename="cf.png"):
         self.train_loss_history = []
         self.val_loss_history = []
         self.train_acc_history = []
@@ -16,6 +16,7 @@ class Trainer:
         self.save_path = save_path
         self.acc_filename = acc_filename
         self.loss_filename = loss_filename
+        self.cf_filename = cf_filename
         
         labels = ['Annual\nCrop', 'Forest',
                   'Herbaceous\nVegetation',
@@ -61,24 +62,24 @@ class Trainer:
         elapsed_time = time.time() - start_time
 
         precision = precision_score(all_labels, all_preds, average='macro', zero_division=1)
-        recall = recall_score(all_labels, all_preds, average='macro', zero_division=1)
         f1 = f1_score(all_labels, all_preds, average='macro', zero_division=1)
 
         self.confusion_matrix = confusion_matrix(all_labels, all_preds)
 
         print(f'\nValidation Results - Epoch:')
         print(f'    Loss: {val_loss:.4f}, Accuracy: {val_acc:.2f}%')
-        print(f'    Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}')
+        print(f'    Precision: {precision:.4f}, F1 Score: {f1:.4f}')
         print(f'    Confusion Matrix:\n{self.confusion_matrix}')
         print(f'    Time spent testing: {elapsed_time:.2f} seconds\n')
 
-        return val_loss, val_acc, precision, recall, f1
+        return val_loss, val_acc, precision, f1
 
     def save_best_model(self, model):
+        # TODO: Add parameter for weights name and path.
         # Save the model state
-        torch.save(model.state_dict(), f"{self.save_path}/best_model.pth")
-        print("Best model saved.")
-
+        #torch.save(model.state_dict(), "checkpoints/best_model.pth")
+        pass
+    
     def train_model(self, train_loader, val_loader, model, device, optimizer, num_epochs, plot=True, verbose=True, schedulefree=False):
         model = model.to(device)
         criterion = torch.nn.CrossEntropyLoss()
@@ -124,12 +125,11 @@ class Trainer:
 
             if schedulefree:
                 optimizer.eval()
-            val_loss, val_acc, precision, recall, f1 = self.test_model(val_loader, model, device)
+            val_loss, val_acc, precision, f1 = self.test_model(val_loader, model, device)
 
             self.val_loss_history.append(val_loss)
             self.val_acc_history.append(val_acc)
             self.precision_history.append(precision)
-            self.recall_history.append(recall)
             self.f1_history.append(f1)
 
             # Check if the current validation accuracy is better than the best one
@@ -138,14 +138,14 @@ class Trainer:
                 self.best_model_state = model.state_dict()  # Save the current model state
 
         # Save the best model at the end of training
-        if self.best_model_state is not None:
-            model.load_state_dict(self.best_model_state)  # Load the best model state
-            self.save_best_model(model)
+        #if self.best_model_state is not None:
+        #    model.load_state_dict(self.best_model_state)  # Load the best model state
+        #    self.save_best_model(model)
 
         # Plot results if required
         if plot:
             line_plot("Accuracy", [self.train_acc_history, self.val_acc_history], 
-                      ["Train Accuracy", "Test Accuracy"], "Epoch", "(%)", self.save_path, self.acc_filename)
+                      ["Train Accuracy", "Test Accuracy"], "Epoch", "%", self.save_path, self.acc_filename)
             line_plot("Loss", [self.train_loss_history, self.val_loss_history], 
                       ["Train Loss", "Test Loss"], "Epoch", "", self.save_path, self.loss_filename)
-            cf_plot(self.confusion_matrix, self.labels)
+            cf_plot(self.confusion_matrix, self.labels, save_path=self.save_path, filename=self.cf_filename)

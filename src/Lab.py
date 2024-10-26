@@ -6,9 +6,8 @@ from src.EuroSAT import EuroSAT
 from src.ModelInstances import choose_model
 
 class ExperimentConfig:
-    def __init__(self, path_to_save_plots, path_to_save_raw_data, path_to_dataset, experiments, checkpointing):
+    def __init__(self, path_to_save_plots, path_to_dataset, experiments, checkpointing):
         self.path_to_save_plots = path_to_save_plots
-        self.path_to_save_raw_data = path_to_save_raw_data
         self.path_to_dataset = path_to_dataset
         self.experiments = experiments
         self.checkpointing = checkpointing
@@ -24,7 +23,7 @@ class Experiment:
         self.n_classes = n_classes
         self.image_size = image_size
         self.batch_size = batch_size
-        self.allowed_classes = None #allowed_classes
+        self.allowed_classes = None # TODO: Convert allowed classes string to list of integers.
         self.examples_per_class = examples_per_class
         self.epochs = epochs
 
@@ -55,8 +54,7 @@ class ExperimentRunner:
 
     def run_experiment(self, experiment: Experiment):
         # Setup paths
-        # TODO: FIX SAVEPATH BEING THE SAME FOR ALL
-        save_path = f"{self.config.path_to_save_plots}/{experiment.filename}"
+        save_path = f"{self.config.path_to_save_plots}/"
         
         # Initialize model, optimizer, and dataset loaders
         model = self.initialize_model(experiment.model, experiment.n_classes)
@@ -76,7 +74,8 @@ class ExperimentRunner:
         trainer = Trainer(
             save_path=save_path,
             acc_filename=f"{experiment.filename}_acc.png",
-            loss_filename=f"{experiment.filename}_loss.png"
+            loss_filename=f"{experiment.filename}_loss.png",
+            cf_filename=f"{experiment.filename}_cf.png" 
         )
         
         # Train model
@@ -128,7 +127,6 @@ def load_config_file(file_path):
         # Create and return the ExperimentConfig instance
         return ExperimentConfig(
             path_to_save_plots=data['path_to_save_plots'],
-            path_to_save_raw_data=data['path_to_save_raw_data'],
             path_to_dataset=data['path_to_dataset'],
             experiments=experiments,
             checkpointing=checkpointing
