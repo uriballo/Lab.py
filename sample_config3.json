@@ -1,0 +1,69 @@
+{
+    "path_to_save_plots" : "plots",
+    "path_to_dataset": "EuroSAT_RGB",
+
+    "experiments" : [
+        {
+            "filename": "QEConvAngE_N_Enc_AdamSF_25e-4_10c_1000ex-per-class", 
+            "title" : "Quantum Enhanced Convolutional Model",
+            "model" : "QEConvAngE_N_Enc",
+            "optimizer" : "AdamWSF",
+            "lr" : 0.0025,
+            "weight_decay": 1e-3,
+            "n_classes": 10,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 1000,
+            "epochs": 20
+        },
+        {
+            "filename": "QEConvAngE_N_Enc_AdamSF_3e-4_10c_1000ex-per-class", 
+            "title" : "Quantum Enhanced Convolutional Model",
+            "model" : "QEConvAngE_N_Enc",
+            "optimizer" : "AdamWSF",
+            "lr" : 3e-4,
+            "weight_decay": 1e-3,
+            "n_classes": 10,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 1000,
+            "epochs": 20
+        },
+        {
+            "filename": "QEConvAngE_N_Enc_AdamSF_25e-4_FullDatsest", 
+            "title" : "Quantum Enhanced Convolutional Model",
+            "model" : "QEConvAngE_N_Enc",
+            "optimizer" : "AdamWSF",
+            "lr" : 25e-4,
+            "weight_decay": 1e-3,
+            "n_classes": 10,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 10000,
+            "epochs": 20
+        },
+        {
+            "filename": "QEConvAngE_N_Enc_SGDSF_1_10c_1000ex-per-class", 
+            "title" : "Quantum Enhanced Convolutional Model",
+            "model" : "QEConvAngE_N_Enc",
+            "optimizer" : "SGDSF",
+            "lr" : 1,
+            "weight_decay": 1e-3,
+            "n_classes": 10,
+            "image_size": 64,
+            "batch_size": 256,
+            "allowed_classes": "None",
+            "examples_per_class": 1000,
+            "epochs": 20
+        }
+    ],
+    
+    "checkpointing": {
+        "save_best": "True", 
+        "monitor": "val_accuracy",
+        "save_path": "checkpoints/"
+    }
+}
